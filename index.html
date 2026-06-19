@@ -94,14 +94,6 @@ nav{position:sticky;top:0;z-index:100;background:var(--verde);box-shadow:0 2px 1
 .campo input:focus,.campo select:focus{outline:2px solid var(--verde-claro);border-color:transparent}
 .calc-wrap .nota{font-size:12.5px;color:var(--cinza);margin-top:10px;line-height:1.6}
 
-.result-box{background:linear-gradient(135deg,var(--verde-escuro),var(--verde));color:#fff;border-radius:12px;padding:28px 30px;margin:26px 0 18px;box-shadow:var(--shadow)}
-.result-box .rotulo{font-size:12px;color:rgba(255,255,255,.75);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
-.result-box .valor-big{font-size:42px;font-weight:800;color:#fff;margin:6px 0 4px;line-height:1}
-.result-box .sub{font-size:13.5px;color:rgba(255,255,255,.8)}
-.result-box .delta{display:inline-block;margin-top:10px;font-size:13.5px;font-weight:700;padding:4px 12px;border-radius:20px}
-.delta.pos{background:rgba(164,69,47,.25);color:#ffb39e}
-.delta.neg{background:rgba(31,122,77,.25);color:#9ee6c1}
-
 .result-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:6px}
 .rcard{background:var(--areia);border:1px solid var(--borda);border-radius:var(--r);padding:18px;text-align:center}
 .rcard .rl{font-size:11.5px;color:var(--cinza);font-weight:600;text-transform:uppercase;letter-spacing:.3px}
@@ -243,7 +235,7 @@ footer{background:var(--verde-escuro);color:rgba(255,255,255,.7);padding:48px 28
         <div class="ucard">
           <div class="ucard-icon">📉</div>
           <div class="ucard-title">ISS sai de cena gradualmente</div>
-          <div class="ucard-desc">De 5% em 2026 para 0% em 2033, o ISS perde espaço enquanto o IBS é implementado em etapas anuais (10%, 20%, 30%, 40%, 100%).</div>
+          <div class="ucard-desc">De até 5% em 2026 para 0% em 2033, o ISS perde espaço enquanto o IBS é implementado em etapas anuais (10%, 20%, 30%, 40%, 100%).</div>
         </div>
         <div class="ucard">
           <div class="ucard-icon">🧾</div>
@@ -299,7 +291,7 @@ footer{background:var(--verde-escuro);color:rgba(255,255,255,.7);padding:48px 28
 
       <div class="calc-grid">
         <div class="campo">
-          <label>Valor da comissão ou taxa de administração, sem IBS e CBS (R$)</label>
+          <label>Valor sem IBS e CBS (R$)</label>
           <input id="valorBase" type="text" class="money" value="R$ 100.000,00">
         </div>
         <div class="campo">
@@ -320,37 +312,27 @@ footer{background:var(--verde-escuro);color:rgba(255,255,255,.7);padding:48px 28
           </select>
         </div>
       </div>
-      <p class="nota">Pré Reforma: ISS na alíquota informada + PIS/Cofins de 3,65% (regime cumulativo). A partir de 2027: ISS reduzido gradualmente até 0% em 2033, substituído pelo IBS e pela CBS — alíquotas de referência de 18,5% (IBS) e 8,5% (CBS), com redutor de 50% aplicado ao setor imobiliário, conforme LC 214/2025. A tributação é a mesma para comissão de venda e taxa de administração.</p>
-
-      <div class="result-box">
-        <div class="rotulo" id="rotuloResultado">Custo para o cliente Pessoa Física</div>
-        <div class="valor-big" id="rCustoPF">—</div>
-        <div class="sub" id="rSubPF">vs. Pré Reforma</div>
-        <span class="delta" id="rDeltaPF"></span>
-      </div>
+      <p class="nota">Selecione "Pré Reforma" para ver a tributação vigente até 2026 (ISS na alíquota informada + PIS/Cofins de 3,65%, regime cumulativo). A partir de 2029: ISS reduzido gradualmente até 0% em 2033, substituído pelo IBS e pela CBS — alíquotas de referência de 18,5% (IBS) e 8,5% (CBS), com redutor de 50% aplicado ao setor imobiliário, conforme LC 214/2025. A tributação é a mesma para comissão de venda e taxa de administração.</p>
 
       <div class="result-grid">
         <div class="rcard">
           <div class="rl" id="rotuloLiquido">Receita líquida da imobiliária</div>
           <div class="rv" id="rLiquido">—</div>
-          <div class="rd" id="rLiquidoDelta"></div>
         </div>
         <div class="rcard">
           <div class="rl">Custo para cliente Pessoa Jurídica</div>
           <div class="rv" id="rCustoPJ">—</div>
-          <div class="rd" id="rCustoPJDelta"></div>
         </div>
         <div class="rcard">
-          <div class="rl">IBS / CBS devido</div>
-          <div class="rv" id="rIbsCbs">—</div>
-          <div class="rd" id="rIss"></div>
+          <div class="rl">Custo para cliente Pessoa Física</div>
+          <div class="rv" id="rCustoPF">—</div>
         </div>
       </div>
 
       <div class="tblwrap">
         <table class="evol" id="tblEvolucao"></table>
       </div>
-      <p class="nota">A coluna "Pré Reforma" representa a tributação vigente até 2026 (apenas ISS, sem IBS/CBS), usada como referência de comparação. O cliente Pessoa Jurídica contribuinte recupera o IBS/CBS como crédito; por isso seu custo é igual à receita líquida da imobiliária. Cálculo estimado para fins educacionais — não substitui apuração fiscal formal.</p>
+      <p class="nota">A tabela mostra a evolução de 2027 a 2033. Cálculo estimado para fins educacionais — não substitui apuração fiscal formal.</p>
 
     </div>
   </div>
@@ -491,18 +473,20 @@ function buildRates(issBase){
 }
 
 // Resolve o sistema circular ISS/IBS-CBS em forma fechada:
-//   netCore = receita líquida da imobiliária após ISS (antes do PIS/Cofins)
+//   Receita líquida da imobiliária = D23 da planilha base = receita após ISS
 //   ISS incide sobre (receita + IBS/CBS); IBS/CBS incide sobre a receita líquida
 //   PIS/Cofins (regime cumulativo, só hoje) incide sobre o valor da comissão (C)
+//   Custo do cliente Pessoa Física = D21 + D24 da planilha base = valor da comissão (C) + IBS/CBS
+//   Custo do cliente Pessoa Jurídica = D21 da planilha base = valor da comissão (C)
 function compute(C, iss, t, pis){
   pis = pis || 0;
   const netCore = C * (1 - iss) / (1 + iss * t);
   const pisValor = -pis * C;
-  const net = netCore + pisValor;
+  const net = netCore; // Receita líquida = D23 da planilha (não considera PIS/Cofins)
   const ibscbs = netCore * t;
   const issValor = netCore - C; // negativo
-  const total = net + ibscbs;
-  return { net, ibscbs, issValor, pisValor, total, custoPF: total, custoPJ: net };
+  const total = C + ibscbs;
+  return { net, ibscbs, issValor, pisValor, total, custoPF: total, custoPJ: C };
 }
 
 const fmt = v => v.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
@@ -527,48 +511,26 @@ function recalc(){
   const ano = document.getElementById('anoOperacao').value;
   const RATES = buildRates(issBase);
   const r = RATES[ano];
-  const atualRate = RATES.atual;
 
   const res = compute(C, r.iss, r.t, r.pis);
-  const atual = compute(C, atualRate.iss, atualRate.t, atualRate.pis);
-
   const lbl = { net:'Receita líquida da imobiliária' };
-
-  const deltaPF = atual.custoPF !== 0 ? (res.custoPF/atual.custoPF - 1) * 100 : 0;
-  const deltaNet = atual.net !== 0 ? (res.net/atual.net - 1) * 100 : 0;
-  const deltaPJ = atual.custoPJ !== 0 ? (res.custoPJ/atual.custoPJ - 1) * 100 : 0;
-
-  document.getElementById('rotuloResultado').textContent = 'Custo para o cliente Pessoa Física em ' + r.label;
-  document.getElementById('rCustoPF').textContent = fmtRS(res.custoPF);
-  document.getElementById('rSubPF').textContent = 'Pré Reforma: ' + fmtRS(atual.custoPF);
-  const dPF = document.getElementById('rDeltaPF');
-  dPF.textContent = (ano==='atual' ? 'referência Pré Reforma' : fmtPct(deltaPF) + ' em relação ao Pré Reforma');
-  dPF.className = 'delta ' + (deltaPF > 0.01 ? 'pos' : (deltaPF < -0.01 ? 'neg' : ''));
 
   document.getElementById('rotuloLiquido').textContent = lbl.net;
   document.getElementById('rLiquido').textContent = fmtRS(res.net);
-  const dL = document.getElementById('rLiquidoDelta');
-  dL.textContent = ano==='atual' ? '' : fmtPct(deltaNet) + ' vs. Pré Reforma';
-  dL.className = 'rd ' + (deltaNet > 0.01 ? 'pos' : (deltaNet < -0.01 ? 'neg' : ''));
 
   document.getElementById('rCustoPJ').textContent = fmtRS(res.custoPJ);
-  const dPJ = document.getElementById('rCustoPJDelta');
-  dPJ.textContent = ano==='atual' ? '' : fmtPct(deltaPJ) + ' vs. Pré Reforma';
-  dPJ.className = 'rd ' + (deltaPJ > 0.01 ? 'pos' : (deltaPJ < -0.01 ? 'neg' : ''));
 
-  document.getElementById('rIbsCbs').textContent = fmtRS(res.ibscbs);
-  document.getElementById('rIss').textContent = 'ISS: ' + fmtRS(Math.abs(res.issValor));
+  document.getElementById('rCustoPF').textContent = fmtRS(res.custoPF);
 
-  // Tabela de evolução
-  let h = '<tr><th>Ano</th><th>ISS</th><th>PIS/Cofins</th><th>CBS+IBS</th><th>' + lbl.net + '</th><th>Custo cliente PJ</th><th>Custo cliente PF</th></tr>';
-  ORDEM.forEach(key => {
+  // Tabela de evolução (2027 a 2033, sem a linha Pré Reforma)
+  let h = '<tr><th>Ano</th><th>ISS</th><th>CBS+IBS</th><th>' + lbl.net + '</th><th>Custo cliente PJ</th><th>Custo cliente PF</th></tr>';
+  ORDEM.filter(key => key !== 'atual').forEach(key => {
     const rr = RATES[key];
     const c = compute(C, rr.iss, rr.t, rr.pis);
-    const cls = (key === ano ? 'highlight' : (key === 'atual' ? 'atual' : ''));
+    const cls = (key === ano ? 'highlight' : '');
     h += `<tr class="${cls}">
       <td>${rr.label}</td>
       <td>${(rr.iss*100).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})}%</td>
-      <td>${(rr.pis*100).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})}%</td>
       <td>${(rr.t*100).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}%</td>
       <td>${fmtRS(c.net)}</td>
       <td>${fmtRS(c.custoPJ)}</td>
