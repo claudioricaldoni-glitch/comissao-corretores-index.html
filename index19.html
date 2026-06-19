@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador de Comissão e Taxa de Administração — Térreo | Calculadora gratuita da Reforma Tributária para Corretores</title>
+<meta name="description" content="Descubra como a Reforma Tributária muda o valor da comissão e da taxa de administração das imobiliárias entre 2027 e 2033. Calculadora gratuita criada pela Térreo, 1ª startup de tributação imobiliária do Brasil.">
+<style>
+/* ====== RESET & TOKENS (idêntico ao padrão Térreo) ====== */
+:root{
+  --verde:#1d4d3a; --verde-claro:#2e7d5b; --verde-escuro:#152f25;
+  --areia:#f6f3ee; --areia-claro:#faf8f5;
+  --ink:#1d2521; --cinza:#6b7570; --borda:#dfdad2;
+  --branco:#fff; --destaque:#c8a24b; --destaque-claro:#d9b46b;
+  --ok:#1f7a4d; --ruim:#a4452f;
+  --r:8px; --shadow:0 4px 20px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--areia-claro);color:var(--ink);font-size:15px;line-height:1.6}
+
+/* ====== NAV ====== */
+nav{position:sticky;top:0;z-index:100;background:var(--verde);box-shadow:0 2px 12px rgba(0,0,0,.2)}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.nav-logo{color:#fff;font-size:18px;font-weight:700;letter-spacing:-.3px;text-decoration:none;flex-shrink:0}
+.nav-logo span{color:var(--destaque)}
+.nav-links{display:flex;gap:24px;list-style:none;align-items:center}
+.nav-links a{color:rgba(255,255,255,.85);text-decoration:none;font-size:13.5px;font-weight:500;transition:.15s}
+.nav-links a:hover{color:#fff}
+.nav-cta{background:var(--destaque);color:#fff!important;padding:8px 18px;border-radius:20px;font-weight:700!important;font-size:13px!important;white-space:nowrap}
+.nav-cta:hover{background:var(--destaque-claro)!important}
+@media(max-width:760px){.nav-links{display:none}}
+
+/* ====== HERO ====== */
+.hero{background:linear-gradient(135deg,var(--verde-escuro) 0%,var(--verde) 60%,#25664d 100%);color:#fff;padding:80px 28px 90px;text-align:center}
+.hero-tag{display:inline-block;background:rgba(200,162,75,.25);border:1px solid var(--destaque);color:var(--destaque-claro);font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:4px 14px;border-radius:20px;margin-bottom:22px}
+.hero h1{font-size:clamp(26px,4vw,46px);font-weight:800;line-height:1.2;max-width:820px;margin:0 auto 20px;letter-spacing:-.5px}
+.hero h1 span{color:var(--destaque)}
+.hero p{font-size:clamp(15px,2vw,18px);max-width:640px;margin:0 auto 36px;opacity:.88;line-height:1.7}
+.hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn-primary{background:var(--destaque);color:#fff;text-decoration:none;font-weight:700;font-size:16px;padding:15px 32px;border-radius:30px;box-shadow:0 4px 20px rgba(200,162,75,.4);transition:.2s;display:inline-block;border:none;cursor:pointer}
+.btn-primary:hover{background:var(--destaque-claro);transform:translateY(-1px)}
+.btn-outline{border:2px solid rgba(255,255,255,.5);color:#fff;text-decoration:none;font-weight:600;font-size:15px;padding:13px 28px;border-radius:30px;transition:.2s;display:inline-block}
+.btn-outline:hover{border-color:#fff;background:rgba(255,255,255,.08)}
+.hero-note{font-size:12.5px;opacity:.6;margin-top:20px}
+
+/* ====== STATS STRIP ====== */
+.stats{background:var(--branco);border-bottom:1px solid var(--borda)}
+.stats-inner{max-width:1200px;margin:0 auto;padding:0 28px;display:grid;grid-template-columns:repeat(3,1fr)}
+.stat{padding:28px 24px;text-align:center;border-right:1px solid var(--borda)}
+.stat:last-child{border-right:none}
+.stat-num{font-size:32px;font-weight:800;color:var(--verde);line-height:1}
+.stat-label{font-size:13px;color:var(--cinza);margin-top:6px;line-height:1.4}
+@media(max-width:700px){.stats-inner{grid-template-columns:1fr}.stat{border-right:none;border-bottom:1px solid var(--borda)}.stat:last-child{border-bottom:none}}
+
+/* ====== SECTION GENERIC ====== */
+.section{padding:72px 28px}
+.section-inner{max-width:1200px;margin:0 auto}
+.section-tag{font-size:11.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--destaque);margin-bottom:10px}
+.section h2{font-size:clamp(22px,3vw,34px);font-weight:800;color:var(--verde);line-height:1.25;margin-bottom:14px;letter-spacing:-.3px}
+.section .lead{font-size:16.5px;color:var(--cinza);max-width:640px;line-height:1.7;margin-bottom:40px}
+
+/* ====== POR QUE AGORA ====== */
+.urgencia{background:var(--areia)}
+.urgencia-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.urgencia-txt h2{margin-bottom:18px}
+.urgencia-txt p{font-size:15.5px;color:var(--cinza);line-height:1.8;margin-bottom:16px}
+.urgencia-txt .destaque-txt{background:rgba(200,162,75,.12);border-left:4px solid var(--destaque);padding:14px 18px;border-radius:0 var(--r) var(--r) 0;font-size:14.5px;font-weight:600;color:var(--ink);margin-top:8px}
+.urgencia-cards{display:flex;flex-direction:column;gap:14px}
+.ucard{background:var(--branco);border:1px solid var(--borda);border-radius:var(--r);padding:18px 20px;box-shadow:var(--shadow)}
+.ucard-icon{font-size:22px;margin-bottom:8px}
+.ucard-title{font-weight:700;color:var(--verde);margin-bottom:4px;font-size:14.5px}
+.ucard-desc{font-size:13.5px;color:var(--cinza);line-height:1.5}
+@media(max-width:768px){.urgencia-grid{grid-template-columns:1fr}}
+
+/* ====== COMO FUNCIONA ====== */
+.steps{background:var(--branco)}
+.steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:8px}
+.step{text-align:center;padding:32px 20px}
+.step-num{width:52px;height:52px;border-radius:50%;background:var(--verde);color:#fff;font-size:22px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 18px}
+.step h3{font-size:16px;font-weight:700;color:var(--verde);margin-bottom:8px}
+.step p{font-size:14px;color:var(--cinza);line-height:1.6}
+@media(max-width:640px){.steps-grid{grid-template-columns:1fr}}
+
+/* ====== CALCULADORA ====== */
+.calc-section{background:var(--areia);padding:72px 0 80px}
+.calc-header{max-width:1100px;margin:0 auto;padding:0 28px 28px;text-align:center}
+.calc-wrap{max-width:1100px;margin:0 auto;padding:0 28px}
+.calc-card{background:var(--branco);border:1px solid var(--borda);border-radius:12px;padding:32px;box-shadow:var(--shadow)}
+.calc-grid{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:8px}
+.campo{display:flex;flex-direction:column;gap:5px;flex:1;min-width:200px}
+.campo label{font-size:12.5px;color:var(--cinza);font-weight:600}
+.campo input,.campo select{padding:10px 12px;border:1px solid var(--borda);border-radius:7px;font-size:14.5px;background:#fff;width:100%;font-family:inherit}
+.campo input:focus,.campo select:focus{outline:2px solid var(--verde-claro);border-color:transparent}
+.calc-wrap .nota{font-size:12.5px;color:var(--cinza);margin-top:10px;line-height:1.6}
+
+.result-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:6px}
+.rcard{background:var(--areia);border:1px solid var(--borda);border-radius:var(--r);padding:18px;text-align:center}
+.rcard .rl{font-size:11.5px;color:var(--cinza);font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+.rcard .rv{font-size:19px;font-weight:800;color:var(--verde);margin-top:8px}
+.rcard .rd{font-size:12px;margin-top:4px;font-weight:700}
+.rcard .rd.pos{color:var(--ruim)}
+.rcard .rd.neg{color:var(--ok)}
+@media(max-width:640px){.result-grid{grid-template-columns:1fr}}
+
+.tblwrap{overflow-x:auto;margin-top:24px;border-radius:var(--r);border:1px solid var(--borda)}
+table.evol{width:100%;border-collapse:collapse;font-size:13px;background:#fff;min-width:680px}
+table.evol th,table.evol td{border-bottom:1px solid var(--borda);padding:10px 12px;text-align:right;white-space:nowrap}
+table.evol th{background:#eef0ec;color:var(--verde);font-size:11.5px;text-transform:uppercase;letter-spacing:.3px}
+table.evol td:first-child,table.evol th:first-child{text-align:left}
+table.evol tr.highlight td{background:rgba(200,162,75,.12);font-weight:700}
+
+/* ====== CTA FINAL (estilo "relatorio") ====== */
+.cta-final{background:var(--verde);color:#fff;padding:80px 28px}
+.cta-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1.2fr 1fr;gap:64px;align-items:center}
+.cta-txt .tag{display:inline-block;background:rgba(200,162,75,.25);border:1px solid var(--destaque);color:var(--destaque-claro);font-size:11.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:18px}
+.cta-txt h2{font-size:clamp(22px,3vw,32px);font-weight:800;color:#fff;line-height:1.2;margin-bottom:16px}
+.cta-txt p{font-size:15px;opacity:.85;line-height:1.8;margin-bottom:16px}
+.checklist{list-style:none;display:flex;flex-direction:column;gap:10px;margin:20px 0 0}
+.checklist li{display:flex;align-items:flex-start;gap:10px;font-size:14px;opacity:.9}
+.checklist li::before{content:"✓";color:var(--destaque);font-weight:700;font-size:16px;flex-shrink:0;margin-top:1px}
+.cta-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:32px;text-align:center}
+.cta-card .cta-label{font-size:12px;opacity:.7;font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px}
+.cta-card .cta-titulo{font-size:20px;font-weight:800;color:#fff;margin-bottom:18px;line-height:1.4}
+.cta-card .btn-comprar{display:block;text-align:center;background:var(--destaque);color:#fff;text-decoration:none;font-weight:700;font-size:16px;padding:16px;border-radius:10px;box-shadow:0 4px 20px rgba(200,162,75,.4);transition:.2s;margin-bottom:14px}
+.cta-card .btn-comprar:hover{background:var(--destaque-claro)}
+.cta-card .btn-contato{display:block;text-align:center;color:rgba(255,255,255,.7);font-size:13.5px;text-decoration:none;transition:.15s}
+.cta-card .btn-contato:hover{color:#fff}
+@media(max-width:768px){.cta-inner{grid-template-columns:1fr;gap:40px}}
+
+/* ====== SOBRE ====== */
+.sobre{background:var(--areia);padding:80px 28px}
+.sobre-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:auto 1fr;gap:56px;align-items:start}
+.sobre-avatar{width:160px;height:160px;border-radius:50%;background:linear-gradient(135deg,var(--verde),var(--verde-claro));display:flex;align-items:center;justify-content:center;color:#fff;font-size:52px;font-weight:800;flex-shrink:0;box-shadow:0 8px 32px rgba(29,77,58,.25)}
+.sobre-txt .section-tag{margin-bottom:6px}
+.sobre-txt h2{font-size:clamp(20px,2.5vw,30px);font-weight:800;color:var(--verde);margin-bottom:8px}
+.sobre-txt .cargo{font-size:14px;color:var(--destaque);font-weight:700;margin-bottom:16px}
+.sobre-txt p{font-size:15px;color:var(--cinza);line-height:1.8;margin-bottom:14px}
+.sobre-nums{display:flex;gap:32px;margin-top:20px;flex-wrap:wrap}
+.sobre-num .n{font-size:28px;font-weight:800;color:var(--verde)}
+.sobre-num .l{font-size:12.5px;color:var(--cinza)}
+@media(max-width:640px){.sobre-inner{grid-template-columns:1fr;text-align:center}.sobre-avatar{margin:0 auto}.sobre-nums{justify-content:center}}
+
+/* ====== FAQ ====== */
+.faq{background:var(--branco);padding:80px 28px}
+.faq-inner{max-width:820px;margin:0 auto}
+.faq-inner h2{text-align:center;margin-bottom:40px}
+.faq-item{border-bottom:1px solid var(--borda);padding:20px 0}
+.faq-item:last-child{border-bottom:none}
+.faq-q{font-weight:700;color:var(--verde);font-size:15.5px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;user-select:none}
+.faq-q::after{content:"+";font-size:22px;color:var(--destaque);flex-shrink:0;line-height:1}
+.faq-item.open .faq-q::after{content:"−"}
+.faq-a{font-size:14.5px;color:var(--cinza);line-height:1.8;max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s}
+.faq-item.open .faq-a{max-height:500px;padding-top:12px}
+
+/* ====== FOOTER ====== */
+footer{background:var(--verde-escuro);color:rgba(255,255,255,.7);padding:48px 28px 32px}
+.footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr;gap:48px}
+.footer-brand{color:#fff;font-size:20px;font-weight:700;margin-bottom:10px}
+.footer-brand span{color:var(--destaque)}
+.footer-desc{font-size:13.5px;line-height:1.7}
+.footer-col h4{color:#fff;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px}
+.footer-col a{display:block;color:rgba(255,255,255,.65);text-decoration:none;font-size:13.5px;margin-bottom:8px;transition:.15s}
+.footer-col a:hover{color:#fff}
+.footer-bottom{max-width:1200px;margin:32px auto 0;padding-top:24px;border-top:1px solid rgba(255,255,255,.1);display:flex;justify-content:space-between;font-size:12.5px;flex-wrap:wrap;gap:8px}
+@media(max-width:680px){.footer-inner{grid-template-columns:1fr}.footer-bottom{flex-direction:column}}
+</style>
+</head>
+<body>
+
+<!-- ====== NAV ====== -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">Térreo<span>.</span></a>
+    <ul class="nav-links">
+      <li><a href="#por-que">A Reforma</a></li>
+      <li><a href="#como-funciona">Como funciona</a></li>
+      <li><a href="#calculadora">Calculadora</a></li>
+      <li><a href="#sobre">Sobre</a></li>
+      <li><a href="#cta" class="nav-cta">Falar com a Térreo</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ====== HERO ====== -->
+<section class="hero">
+  <div class="hero-tag">Calculadora gratuita — Comissão e Taxa de Administração</div>
+  <h1>A Reforma Tributária muda a conta da comissão. Quanto isso vai custar para o <span>seu</span> cliente?</h1>
+  <p>Simule gratuitamente como o IBS e a CBS impactam a comissão de intermediação e a taxa de administração da sua imobiliária entre 2027 e 2033 — e entenda a diferença entre cliente Pessoa Física e Pessoa Jurídica.</p>
+  <div class="hero-btns">
+    <a href="#calculadora" class="btn-primary">Simular gratuitamente →</a>
+    <a href="#por-que" class="btn-outline">Entender a mudança</a>
+  </div>
+  <p class="hero-note">Sem cadastro. Sem compartilhamento de dados. O cálculo roda no seu navegador.</p>
+</section>
+
+<!-- ====== STATS ====== -->
+<div class="stats">
+  <div class="stats-inner">
+    <div class="stat">
+      <div class="stat-num">2027–2033</div>
+      <div class="stat-label">período de transição gradual<br>de alíquotas do IBS e CBS</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">5% → 0%</div>
+      <div class="stat-label">o ISS sobre a comissão é extinto<br>de forma gradual até 2033</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">até +19%</div>
+      <div class="stat-label">de aumento no custo final para<br>o cliente Pessoa Física em 2033</div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== POR QUE AGORA ====== -->
+<section class="section urgencia" id="por-que">
+  <div class="section-inner">
+    <div class="urgencia-grid">
+      <div class="urgencia-txt">
+        <div class="section-tag">Por que isso gera insegurança?</div>
+        <h2>A comissão e a taxa de administração vão ser tributadas de um jeito novo — e diferente para cada tipo de cliente</h2>
+        <p>A LC 214/2025 substitui o ISS pelo IBS e a CBS na prestação de serviços, incluindo a intermediação imobiliária e a administração de locação. A transição é gradual, ano a ano, entre 2027 e 2033.</p>
+        <p>O ponto que mais confunde corretores e imobiliárias: o cliente Pessoa Jurídica contribuinte de IBS/CBS pode recuperar esse tributo como crédito — mas o cliente Pessoa Física (consumidor final) não. Isso significa que, para o mesmo valor de comissão, o custo final pode ser bem diferente dependendo de quem está pagando.</p>
+        <div class="destaque-txt">
+          Sem entender essa conta, o corretor corre o risco de negociar mal a comissão ou de ser surpreendido por uma cobrança maior do que o esperado a partir de 2027.
+        </div>
+      </div>
+      <div class="urgencia-cards">
+        <div class="ucard">
+          <div class="ucard-icon">⚖️</div>
+          <div class="ucard-title">Redutor de 50% para o setor imobiliário</div>
+          <div class="ucard-desc">A intermediação imobiliária tem redução de 50% nas alíquotas padrão de CBS e IBS — mas a alíquota cheia ainda pesa mais do que o ISS pré-reforma.</div>
+        </div>
+        <div class="ucard">
+          <div class="ucard-icon">📉</div>
+          <div class="ucard-title">ISS sai de cena gradualmente</div>
+          <div class="ucard-desc">De até 5% em 2026 para 0% em 2033, o ISS perde espaço enquanto o IBS é implementado em etapas anuais (10%, 20%, 30%, 40%, 100%).</div>
+        </div>
+        <div class="ucard">
+          <div class="ucard-icon">🧾</div>
+          <div class="ucard-title">PF paga mais, PJ recupera crédito</div>
+          <div class="ucard-desc">Cliente Pessoa Jurídica contribuinte recupera o IBS/CBS como crédito. Cliente Pessoa Física absorve o tributo no preço final.</div>
+        </div>
+        <div class="ucard">
+          <div class="ucard-icon">🗓️</div>
+          <div class="ucard-title">Mesma lógica para comissão e administração</div>
+          <div class="ucard-desc">Comissão de venda e taxa de administração de locação seguem a mesma transição tributária — ambas são serviços de intermediação imobiliária.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== COMO FUNCIONA ====== -->
+<section class="section steps" id="como-funciona">
+  <div class="section-inner">
+    <div style="text-align:center">
+      <div class="section-tag">Como funciona</div>
+      <h2>Três passos para entender o impacto na sua comissão</h2>
+    </div>
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Informe o valor e o ano</h3>
+        <p>Escolha se é comissão de venda ou taxa de administração, o valor sem IBS/CBS e o ano em que a operação ocorre. Tudo roda no seu navegador.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>O motor calcula</h3>
+        <p>O simulador aplica as alíquotas de ISS, CBS e IBS vigentes naquele ano, já considerando o redutor de 50% do setor imobiliário.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Veja o impacto real</h3>
+        <p>Compare a receita líquida da imobiliária e o custo final para o cliente Pessoa Física e Pessoa Jurídica em cada ano da transição.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== CALCULADORA ====== -->
+<section class="calc-section" id="calculadora">
+  <div class="calc-header">
+    <div class="section-tag">Calculadora gratuita</div>
+    <h2 style="font-size:clamp(22px,3vw,34px);font-weight:800;color:var(--verde)">Simule sua comissão ou taxa de administração</h2>
+    <p style="color:var(--cinza);font-size:16px;margin-top:8px">Preencha os campos abaixo. O resultado aparece automaticamente, sem cadastro.</p>
+  </div>
+  <div class="calc-wrap">
+    <div class="calc-card">
+
+      <div class="calc-grid">
+        <div class="campo">
+          <label>Valor sem IBS e CBS (R$)</label>
+          <input id="valorBase" type="text" class="money" value="R$ 100.000,00">
+        </div>
+        <div class="campo">
+          <label>Alíquota de ISS do município (%)</label>
+          <input id="aliqIss" type="number" step="0.01" min="0" max="5" value="5">
+        </div>
+        <div class="campo">
+          <label>Ano da operação</label>
+          <select id="anoOperacao">
+            <option value="2027">2027</option>
+            <option value="2028">2028</option>
+            <option value="2029" selected>2029</option>
+            <option value="2030">2030</option>
+            <option value="2031">2031</option>
+            <option value="2032">2032</option>
+            <option value="2033">2033 (regime pleno)</option>
+          </select>
+        </div>
+      </div>
+      <p class="nota">A partir de 2029: ISS reduzido gradualmente até 0% em 2033, substituído pelo IBS e pela CBS — alíquotas de referência de 18,5% (IBS) e 8,5% (CBS), com redutor de 50% aplicado ao setor imobiliário, conforme LC 214/2025. A tributação é a mesma para comissão de venda e taxa de administração.</p>
+
+      <div class="result-grid">
+        <div class="rcard">
+          <div class="rl" id="rotuloLiquido">Receita líquida da imobiliária</div>
+          <div class="rv" id="rLiquido">—</div>
+        </div>
+        <div class="rcard">
+          <div class="rl">Custo para cliente Pessoa Jurídica</div>
+          <div class="rv" id="rCustoPJ">—</div>
+        </div>
+        <div class="rcard">
+          <div class="rl">Custo para cliente Pessoa Física</div>
+          <div class="rv" id="rCustoPF">—</div>
+        </div>
+      </div>
+
+      <div class="tblwrap">
+        <table class="evol" id="tblEvolucao"></table>
+      </div>
+      <p class="nota">A tabela mostra a evolução de 2027 a 2033. Cálculo estimado para fins educacionais — não substitui apuração fiscal formal.</p>
+
+    </div>
+  </div>
+</section>
+
+<!-- ====== CTA FINAL ====== -->
+<section class="cta-final" id="cta">
+  <div class="cta-inner">
+    <div class="cta-txt">
+      <div class="tag">Vá além da simulação</div>
+      <h2>Simular é o primeiro passo. Precificar e contratar corretamente é o que protege a sua imobiliária.</h2>
+      <p>A calculadora mostra o impacto estimado na comissão e na taxa de administração. Para aplicar isso na prática — contratos, repasse ao cliente, regime tributário da imobiliária e treinamento do time — a Térreo oferece consultoria especializada em tributação imobiliária.</p>
+      <ul class="checklist">
+        <li>Revisão de contratos de intermediação e administração</li>
+        <li>Definição de cláusulas de repasse do IBS/CBS ao cliente</li>
+        <li>Enquadramento tributário da imobiliária na Reforma</li>
+        <li>Treinamento do time comercial sobre a nova tributação</li>
+      </ul>
+    </div>
+    <div class="cta-card">
+      <div class="cta-label">Calculadora 100% gratuita</div>
+      <div class="cta-titulo">Quer entender o impacto completo na sua operação?</div>
+      <a href="https://wa.me/5531991348396?text=Quero%20entender%20o%20impacto%20da%20Reforma%20Tribut%C3%A1ria%20na%20comiss%C3%A3o%20e%20taxa%20de%20administra%C3%A7%C3%A3o%20da%20minha%20imobili%C3%A1ria." class="btn-comprar" target="_blank">Falar com a Térreo no WhatsApp</a>
+      <a href="mailto:claudio.ricaldoni@terreo.io?subject=Impacto%20da%20Reforma%20na%20comiss%C3%A3o%20e%20taxa%20de%20administra%C3%A7%C3%A3o" class="btn-contato">ou enviar um e-mail →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ====== SOBRE ====== -->
+<section class="sobre" id="sobre">
+  <div class="sobre-inner">
+    <div class="sobre-avatar">CR</div>
+    <div class="sobre-txt">
+      <div class="section-tag">Quem faz isso</div>
+      <h2>Cláudio Ricaldoni</h2>
+      <div class="cargo">Fundador da Térreo · Tributarista Imobiliário</div>
+      <p>Tributarista há mais de 30 anos, com os últimos 16 dedicados exclusivamente à tributação imobiliária. Acompanhou a Reforma Tributária desde antes das primeiras leis e normativos — e foi um dos primeiros profissionais a quantificar o impacto para o mercado imobiliário, incluindo corretores e imobiliárias.</p>
+      <p>A Térreo é a 1ª startup de tributação imobiliária do Brasil, com o propósito de entregar "imposto na medida certa". Esta calculadora traduz a complexidade da LC 214/2025 em números que o corretor pode usar no dia a dia, com o cliente na mesa de negociação.</p>
+      <div class="sobre-nums">
+        <div class="sobre-num"><div class="n">30+</div><div class="l">anos de tributação</div></div>
+        <div class="sobre-num"><div class="n">16</div><div class="l">anos dedicados ao mercado imobiliário</div></div>
+        <div class="sobre-num"><div class="n">LC 214</div><div class="l">análise antes da publicação</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== FAQ ====== -->
+<section class="faq" id="faq">
+  <div class="faq-inner">
+    <div class="section-tag" style="text-align:center">Dúvidas frequentes</div>
+    <h2 style="color:var(--verde)">Perguntas frequentes</h2>
+
+    <div class="faq-item">
+      <div class="faq-q">O que é o IBS e a CBS?</div>
+      <div class="faq-a">O IBS (Imposto sobre Bens e Serviços) e a CBS (Contribuição sobre Bens e Serviços) são os novos tributos criados pela Reforma Tributária (LC 214/2025) para substituir, respectivamente, o ICMS+ISS e o PIS+Cofins. Para serviços imobiliários como comissão e taxa de administração, as alíquotas padrão têm redução de 50%.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">A calculadora serve para comissão e para taxa de administração?</div>
+      <div class="faq-a">Sim. Tanto a comissão de venda/intermediação quanto a taxa de administração de locação são tratadas como serviços de intermediação imobiliária e seguem a mesma lógica de transição do ISS para o IBS/CBS, com o mesmo redutor de 50%.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Qual a diferença entre o resultado para Pessoa Física e Pessoa Jurídica?</div>
+      <div class="faq-a">O cliente Pessoa Jurídica contribuinte de IBS/CBS pode recuperar esse valor como crédito tributário, então o custo efetivo dele tende a ficar próximo da receita líquida da imobiliária. Já o cliente Pessoa Física, por ser consumidor final não contribuinte, não recupera esse crédito e paga o preço total, já incluindo o IBS/CBS.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Os meus dados ficam armazenados?</div>
+      <div class="faq-a">Não. Todo o cálculo roda diretamente no seu navegador. Nenhum dado é enviado para servidores ou armazenado em qualquer banco de dados.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Essa simulação substitui uma análise tributária da minha imobiliária?</div>
+      <div class="faq-a">Não. A calculadora é uma estimativa simplificada para fins educacionais, com base nas alíquotas e na transição previstas na LC 214/2025. Cada imobiliária tem particularidades de regime tributário, município e contrato que podem alterar o resultado — para uma análise específica, fale com a Térreo.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ====== FOOTER ====== -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand">Térreo<span>.</span></div>
+      <p class="footer-desc">Térreo Tecnologia e Inteligência Tributária Ltda.<br>A 1ª startup de tributação imobiliária do Brasil.<br>"Imposto na medida certa."</p>
+    </div>
+    <div class="footer-col">
+      <h4>Navegação</h4>
+      <a href="#por-que">A Reforma</a>
+      <a href="#como-funciona">Como funciona</a>
+      <a href="#calculadora">Calculadora</a>
+      <a href="#sobre">Sobre</a>
+      <a href="#faq">Dúvidas</a>
+    </div>
+    <div class="footer-col">
+      <h4>Contato</h4>
+      <a href="mailto:claudio.ricaldoni@terreo.io">claudio.ricaldoni@terreo.io</a>
+      <a href="https://www.terreo.io" target="_blank">terreo.io</a>
+      <a href="https://www.linkedin.com/in/cláudio-ricaldoni" target="_blank">LinkedIn</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Térreo Tecnologia e Inteligência Tributária Ltda. Todos os direitos reservados.</span>
+    <span>Cálculos com base na LC 214/2025 — estimativa para apoio à decisão.</span>
+  </div>
+</footer>
+
+<script>
+// ============================================================
+// MOTOR DE CÁLCULO — comissão e taxa de administração
+// Replica fielmente a planilha "Tributação imobiliárias (v2).xlsx"
+// ============================================================
+
+// Fator de redução do ISS por ano, conforme cronograma de transição do IBS (LC 214/2025)
+// O ISS cai na mesma proporção em que o IBS é implantado, chegando a 0% em 2033
+const F_IBS = { 2027:0, 2028:0, 2029:0.1, 2030:0.2, 2031:0.3, 2032:0.4, 2033:1.0 };
+// Alíquota total de CBS+IBS por ano, já com redutor de 50% do setor imobiliário aplicado
+const T_RATE = { 2027:0.0425, 2028:0.0425, 2029:0.05175, 2030:0.061, 2031:0.07025, 2032:0.0795, 2033:0.135 };
+const ORDEM = ['2027','2028','2029','2030','2031','2032','2033'];
+
+// Monta as alíquotas de cada ano a partir da alíquota de ISS informada pelo usuário
+function buildRates(issBase){
+  const r = {};
+  ORDEM.forEach(ano => {
+    r[ano] = {
+      label: ano === '2033' ? '2033 em diante' : ano,
+      iss: issBase * (1 - F_IBS[ano]),
+      t: T_RATE[ano]
+    };
+  });
+  return r;
+}
+
+// Resolve o sistema circular ISS/IBS-CBS em forma fechada:
+//   Receita líquida da imobiliária = D23 da planilha base = receita após ISS
+//   ISS incide sobre (receita + IBS/CBS); IBS/CBS incide sobre a receita líquida
+//   Custo do cliente Pessoa Física = D21 + D24 da planilha base = valor da comissão (C) + IBS/CBS
+//   Custo do cliente Pessoa Jurídica = D21 da planilha base = valor da comissão (C)
+function compute(C, iss, t){
+  const netCore = C * (1 - iss) / (1 + iss * t);
+  const net = netCore; // Receita líquida = D23 da planilha
+  const ibscbs = netCore * t;
+  const issValor = netCore - C; // negativo
+  const total = C + ibscbs;
+  return { net, ibscbs, issValor, total, custoPF: total, custoPJ: C };
+}
+
+const fmt = v => v.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+const fmtRS = v => 'R$ ' + fmt(v);
+const fmtPct = v => (v>=0?'+':'') + v.toLocaleString('pt-BR',{minimumFractionDigits:1, maximumFractionDigits:1}) + '%';
+function parseBR(s){
+  if (typeof s === 'number') return s;
+  s = (s||'').toString().trim();
+  if (!s) return 0;
+  s = s.replace(/[R$\s]/g,'').replace(/\./g,'').replace(',', '.');
+  const v = parseFloat(s);
+  return isNaN(v) ? 0 : v;
+}
+function formatMoneyField(el){
+  const v = parseBR(el.value);
+  el.value = v ? fmtRS(v) : '';
+}
+
+function recalc(){
+  const C = parseBR(document.getElementById('valorBase').value);
+  const issBase = (parseFloat(document.getElementById('aliqIss').value) || 0) / 100;
+  const ano = document.getElementById('anoOperacao').value;
+  const RATES = buildRates(issBase);
+  const r = RATES[ano];
+
+  const res = compute(C, r.iss, r.t);
+  const lbl = { net:'Receita líquida da imobiliária' };
+
+  document.getElementById('rotuloLiquido').textContent = lbl.net;
+  document.getElementById('rLiquido').textContent = fmtRS(res.net);
+
+  document.getElementById('rCustoPJ').textContent = fmtRS(res.custoPJ);
+
+  document.getElementById('rCustoPF').textContent = fmtRS(res.custoPF);
+
+  // Tabela de evolução (2027 a 2033)
+  let h = '<tr><th>Ano</th><th>ISS</th><th>CBS+IBS</th><th>' + lbl.net + '</th><th>Custo cliente PJ</th><th>Custo cliente PF</th></tr>';
+  ORDEM.forEach(key => {
+    const rr = RATES[key];
+    const c = compute(C, rr.iss, rr.t);
+    const cls = (key === ano ? 'highlight' : '');
+    h += `<tr class="${cls}">
+      <td>${rr.label}</td>
+      <td>${(rr.iss*100).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})}%</td>
+      <td>${(rr.t*100).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}%</td>
+      <td>${fmtRS(c.net)}</td>
+      <td>${fmtRS(c.custoPJ)}</td>
+      <td>${fmtRS(c.custoPF)}</td>
+    </tr>`;
+  });
+  document.getElementById('tblEvolucao').innerHTML = h;
+}
+
+document.getElementById('valorBase').addEventListener('input', recalc);
+document.getElementById('valorBase').addEventListener('blur', e => { formatMoneyField(e.target); recalc(); });
+document.getElementById('anoOperacao').addEventListener('change', recalc);
+document.getElementById('aliqIss').addEventListener('input', recalc);
+
+// FAQ accordion
+document.querySelectorAll('.faq-item').forEach(item => {
+  item.querySelector('.faq-q').addEventListener('click', () => {
+    const wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!wasOpen) item.classList.add('open');
+  });
+});
+
+recalc();
+</script>
+</body>
+</html>
