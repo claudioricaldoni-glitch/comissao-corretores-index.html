@@ -109,7 +109,6 @@ table.evol th,table.evol td{border-bottom:1px solid var(--borda);padding:10px 12
 table.evol th{background:#eef0ec;color:var(--verde);font-size:11.5px;text-transform:uppercase;letter-spacing:.3px}
 table.evol td:first-child,table.evol th:first-child{text-align:left}
 table.evol tr.highlight td{background:rgba(200,162,75,.12);font-weight:700}
-table.evol tr.atual td{background:#f3f1ec;font-style:italic}
 
 /* ====== CTA FINAL (estilo "relatorio") ====== */
 .cta-final{background:var(--verde);color:#fff;padding:80px 28px}
@@ -273,7 +272,7 @@ footer{background:var(--verde-escuro);color:rgba(255,255,255,.7);padding:48px 28
       <div class="step">
         <div class="step-num">3</div>
         <h3>Veja o impacto real</h3>
-        <p>Compare a receita líquida da imobiliária e o custo final para o cliente Pessoa Física e Pessoa Jurídica, no Pré Reforma e em cada ano da transição.</p>
+        <p>Compare a receita líquida da imobiliária e o custo final para o cliente Pessoa Física e Pessoa Jurídica em cada ano da transição.</p>
       </div>
     </div>
   </div>
@@ -301,7 +300,6 @@ footer{background:var(--verde-escuro);color:rgba(255,255,255,.7);padding:48px 28
         <div class="campo">
           <label>Ano da operação</label>
           <select id="anoOperacao">
-            <option value="atual">Pré Reforma (até 2026)</option>
             <option value="2027">2027</option>
             <option value="2028">2028</option>
             <option value="2029" selected>2029</option>
@@ -312,7 +310,7 @@ footer{background:var(--verde-escuro);color:rgba(255,255,255,.7);padding:48px 28
           </select>
         </div>
       </div>
-      <p class="nota">Selecione "Pré Reforma" para ver a tributação vigente até 2026 (ISS na alíquota informada + PIS/Cofins de 3,65%, regime cumulativo). A partir de 2029: ISS reduzido gradualmente até 0% em 2033, substituído pelo IBS e pela CBS — alíquotas de referência de 18,5% (IBS) e 8,5% (CBS), com redutor de 50% aplicado ao setor imobiliário, conforme LC 214/2025. A tributação é a mesma para comissão de venda e taxa de administração.</p>
+      <p class="nota">A partir de 2029: ISS reduzido gradualmente até 0% em 2033, substituído pelo IBS e pela CBS — alíquotas de referência de 18,5% (IBS) e 8,5% (CBS), com redutor de 50% aplicado ao setor imobiliário, conforme LC 214/2025. A tributação é a mesma para comissão de venda e taxa de administração.</p>
 
       <div class="result-grid">
         <div class="rcard">
@@ -453,20 +451,16 @@ footer{background:var(--verde-escuro);color:rgba(255,255,255,.7);padding:48px 28
 const F_IBS = { 2027:0, 2028:0, 2029:0.1, 2030:0.2, 2031:0.3, 2032:0.4, 2033:1.0 };
 // Alíquota total de CBS+IBS por ano, já com redutor de 50% do setor imobiliário aplicado
 const T_RATE = { 2027:0.0425, 2028:0.0425, 2029:0.05175, 2030:0.061, 2031:0.07025, 2032:0.0795, 2033:0.135 };
-const ORDEM = ['atual','2027','2028','2029','2030','2031','2032','2033'];
-const PIS_COFINS = 0.0365; // regime cumulativo, somente sobre a receita atual (pré-reforma)
+const ORDEM = ['2027','2028','2029','2030','2031','2032','2033'];
 
 // Monta as alíquotas de cada ano a partir da alíquota de ISS informada pelo usuário
 function buildRates(issBase){
-  const r = {
-    atual: { label:'Pré Reforma', iss:issBase, t:0, pis:PIS_COFINS }
-  };
-  ORDEM.slice(1).forEach(ano => {
+  const r = {};
+  ORDEM.forEach(ano => {
     r[ano] = {
       label: ano === '2033' ? '2033 em diante' : ano,
       iss: issBase * (1 - F_IBS[ano]),
-      t: T_RATE[ano],
-      pis: 0
+      t: T_RATE[ano]
     };
   });
   return r;
@@ -475,18 +469,15 @@ function buildRates(issBase){
 // Resolve o sistema circular ISS/IBS-CBS em forma fechada:
 //   Receita líquida da imobiliária = D23 da planilha base = receita após ISS
 //   ISS incide sobre (receita + IBS/CBS); IBS/CBS incide sobre a receita líquida
-//   PIS/Cofins (regime cumulativo, só hoje) incide sobre o valor da comissão (C)
 //   Custo do cliente Pessoa Física = D21 + D24 da planilha base = valor da comissão (C) + IBS/CBS
 //   Custo do cliente Pessoa Jurídica = D21 da planilha base = valor da comissão (C)
-function compute(C, iss, t, pis){
-  pis = pis || 0;
+function compute(C, iss, t){
   const netCore = C * (1 - iss) / (1 + iss * t);
-  const pisValor = -pis * C;
-  const net = netCore; // Receita líquida = D23 da planilha (não considera PIS/Cofins)
+  const net = netCore; // Receita líquida = D23 da planilha
   const ibscbs = netCore * t;
   const issValor = netCore - C; // negativo
   const total = C + ibscbs;
-  return { net, ibscbs, issValor, pisValor, total, custoPF: total, custoPJ: C };
+  return { net, ibscbs, issValor, total, custoPF: total, custoPJ: C };
 }
 
 const fmt = v => v.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
@@ -512,7 +503,7 @@ function recalc(){
   const RATES = buildRates(issBase);
   const r = RATES[ano];
 
-  const res = compute(C, r.iss, r.t, r.pis);
+  const res = compute(C, r.iss, r.t);
   const lbl = { net:'Receita líquida da imobiliária' };
 
   document.getElementById('rotuloLiquido').textContent = lbl.net;
@@ -522,11 +513,11 @@ function recalc(){
 
   document.getElementById('rCustoPF').textContent = fmtRS(res.custoPF);
 
-  // Tabela de evolução (2027 a 2033, sem a linha Pré Reforma)
+  // Tabela de evolução (2027 a 2033)
   let h = '<tr><th>Ano</th><th>ISS</th><th>CBS+IBS</th><th>' + lbl.net + '</th><th>Custo cliente PJ</th><th>Custo cliente PF</th></tr>';
-  ORDEM.filter(key => key !== 'atual').forEach(key => {
+  ORDEM.forEach(key => {
     const rr = RATES[key];
-    const c = compute(C, rr.iss, rr.t, rr.pis);
+    const c = compute(C, rr.iss, rr.t);
     const cls = (key === ano ? 'highlight' : '');
     h += `<tr class="${cls}">
       <td>${rr.label}</td>
